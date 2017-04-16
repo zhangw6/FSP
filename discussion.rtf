@@ -1,0 +1,16 @@
+{\rtf1\ansi\ansicpg950\cocoartf1504\cocoasubrtf600
+{\fonttbl\f0\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;\csgray\c100000;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl340\sa240\partightenfactor0
+
+\f0\fs29\fsmilli14667 \cf2 \expnd0\expndtw0\kerning0
+Actually, the problems encountered in using the LTSA is very different from the problems in Java.\
+By using LTSA, I had to abstract the model from the detailed solution to avoid having to dealing with status of specific object. What we did in LTSA is a higher level abstract model focusing on interaction among processes compared to model in Java. For example, first, we have to assume that all bikes are not defective and tagged, so we can  remove the tags from ALL bikes. Later, in the solution2, I had to assume that all bikes will be ensured to be inspected, so no bike will be consumed from the original belt and we only need to handle the bikes at the end of the new belt. Without such assumption, we have to dig deeper which bike is inspected or not, which is almost impossible in FSP.\
+Also, although we ignore the time factor in LTSA to simplify our model, it is can be very tricky to achieve a non-deadlock situation while in Java implementation, we can avoid deadlocks by setting the sleep time carefully\
+For solution2, I did not block the arm from picking up another bike from the belt while there is already a bike being inspected.  in Java I had set a boolean variable to represent the status of arm. If it is held and make a very sophisticated sleep time to make sure the arm works slower than the inspector and quicker than the beltmover which can ensure in test that it is highly unlikely for inspector to pick another bike while the inspector is busy and there is no missing bike for arm to grab for inspection. \
+In LTSA however, time has been ignored, so we have to ensure that nothing will be picked by arm while inspector is working. \
+\
+}

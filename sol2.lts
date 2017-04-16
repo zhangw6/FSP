@@ -1,0 +1,77 @@
+/** State Models simulating the second solution
+for inspecting defective bikes on a belt.
+ */
+
+/*  Assumption: there are no defective bicycles. 
+That is, you may assume that the inspector removes
+the tags from all bicycles after inspection. 
+Thus, all bicycles will leave the inspector without a tag.
+*/
+const N = 1 
+range T = 0..N 
+const M = 2 
+range ID= 1..M 
+
+
+
+/* s1  - number of bikes on 1st slot of original belt
+   s2  - number of bikes on 2nd slot of original belt
+   s3  - number of bikes on 3rd slot of original belt
+   s4  - number of bikes on 1st slot of new  belt
+   s5 -  number of bikes on 2nd slot of new belt
+   s6 -  number of bikes on 3rd slot of new belt
+*/
+
+BELT = BELT[0][0][0][0][0][0],  
+BELT[s1:T][s2:T][s3:T][s4:T][s5:T][s6:T] = 
+ 	(
+     when (s1==0) bike[ID].enter -> BELT[1][s2][s3][s4][s5][s6]
+    |when (s1==1 && s3==0) bike[ID].s1 -> BELT[0][s1][s2][s4][s5][s6]
+    |when (s2==1 && s3==0) bike[ID].s2 -> BELT[0][s1][s2][s4][s5][s6]
+    |when (s3==1 && s4==0) grab -> removetag -> drop -> BELT[s1][s2][0][1][s5][s6]
+    |when (s4==1 && s6==0) bike[ID].ss1 -> BELT[s1][s2][s3][0][s4][s5]
+    |when (s5==1 && s6==0) bike[ID].ss2 -> BELT[s1][s2][s3][0][s4][s5]
+    |when (s6==1) consume-> BELT[s1][s2][s3][s4][s5][0]
+	).
+ 
+/*
+bike which may contain following actions
+s1 - move from slot1 to slot2 on original belt
+s2 - move from slot2 to slot3 on original belt
+ss1 - move from slot1 to slot2 on new belt
+ss2 - move from slot2 to slot3 on new belt
+*/
+BIKE = (enter->s1->s2 -> ss1 -> ss2-> BIKE).
+
+/*arm which may contain following actions
+*/
+ARM = (grab -> drop -> ARM).
+
+/*arm which may remove the tag for all bikes
+*/
+INSPECTOR = (removetag -> INSPECTOR).
+
+/*handler which may consume all bikes without tags
+*/
+HANDLER = (consume -> HANDLER).
+
+/*safety check to ensure that if inspector cannot mess the
+order of actions such as grab->removetag->drop
+*/
+property INSPECTONCE = (grab -> removetag ->drop -> INSPECTONCE ).
+
+||SAFE_INSPECTONCE = ( {bike[ID]}::INSPECTONCE ).
+
+/*bike producer to offer M bikes onto the belt
+However,technically, it should be infinite
+*/
+||BIKEPRODUCER = ([ID]:BIKE ).
+
+/* a composite bike checker 
+*/
+||BELTCHECKER = (bike:BIKEPRODUCER || BELT  || INSPECTONCE  ).
+
+/*a progress check to ensure that the enter action of bike can eventually happen
+*/
+progress BIKEENTER[ID]= {bike[ID].enter}
+
